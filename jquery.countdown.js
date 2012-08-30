@@ -1,16 +1,51 @@
-<!-- jquery countdown -->
+//------------------
+// jquery countdown 
+// -----------------
+
+
+// ------------------
+// Usage 
+// -----------------
+/*
+	SCRIPT
+	$(function(){
+		$('.countdown').countdown({})
+	})
+
+-------------------------------------
+	HTML
+	<span class="countdown">3600</span>
+	<br>
+	<span class="countdown">100</span>
+
+*/
+
+
 
 ;(function ($, window, document, undefined) {
-	var time; ///number of seconds for countdown
-	 $.fn.countdown = function (options) {
+	
+	var countdownClass = function(elem,time){
+		var time = time;
+		
+		var timerId = setInterval(function() { timer(elem); },1000)
 
-		// Here's a best practice for overriding 'defaults'
-		// with specified options. Note how, rather than a
-		// regular defaults object being passed as the second
-		// parameter, we instead refer to $.fn.countdown.options
-		// explicitly, merging it with the options passed directly
-		// to the plugin. This allows us to override options both
-		// globally and on a per-call level.
+
+		var timer = function(){
+			if(time > 0){
+				time--;
+			}
+			else{
+				time = 0
+				clearInterval(timerId);
+				$.fn.countdown.no_time_left()
+			}
+			
+			$.fn.countdown.show_time_left(elem,time)
+		}
+	}
+
+
+	 $.fn.countdown = function (options) {
 
 		options = $.extend({}, $.fn.countdown.options, options);
 
@@ -21,31 +56,26 @@
 
 
 		return this.each(function () {
-
+			
 			var elem = $(this); //countdown container
-
-			if (isNumber(elem.html()) && time == null) {
+			
+			if (isNumber(elem.html())) {
 				time = Number(elem.html());
 			}
-			if (time == undefined) {
-				time = options.time;
-			}
 
-			setInterval(function() { timer(elem); },1000)
+			new countdownClass($(this), time)
+			
 
 		});
 	};
-	/*
-	 Globally overriding options
-	 Here are our publicly accessible default plugin options
-	 that are available in case the user doesn't pass in all
-	 of the values expected. The user is given a default
-	 experience but can also override the values as necessary.
-	 eg. $fn.countdown.key ='otherval';
-	 */
-	$.fn.countdown.options = {
-		time:3600
-	};
+	
+
+	//-------------------
+	// Countdown Objects
+	//-------------------
+
+	$.fn.countdown.options = {};
+	$.fn.countdown.time = {};
 
 	//-------------------
 	// Countdown Methods
@@ -77,17 +107,14 @@
 		return hours + ':' + minutes + ':' + seconds;
 	};
 
-	$.fn.countdown.show_time_left = function (elem) {
+	$.fn.countdown.show_time_left = function (elem,time) {
 		$(elem).html($.fn.countdown.format_output(time))
 	};
+
 	$.fn.countdown.no_time_left = function () {
+		console.log('no time left');
 	};
 
-	var timer = function(elem){
-		time--;
-		$.fn.countdown.show_time_left(elem)
-	}
-
-
+	
 
 })(jQuery, window, document);
